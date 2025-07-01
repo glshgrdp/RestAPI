@@ -6,34 +6,26 @@ import com.example.libraryproject.model.BookBorrowing;
 
 public class BookBorrowingMapper {
 
-    public static BookBorrowingDTO toDTO(BookBorrowing bookBorrowing) {
-        if (bookBorrowing == null) return null;
+    public static BookBorrowingDTO toDTO(BookBorrowing entity) {
+        if (entity == null) return null;
 
         BookBorrowingDTO dto = new BookBorrowingDTO();
-        dto.setId(bookBorrowing.getId());
-        dto.setBorrowerName(bookBorrowing.getBorrowerName());
-        dto.setBorrowingDate(bookBorrowing.getBorrowingDate());
-        dto.setReturnDate(bookBorrowing.getReturnDate());
-
-        if (bookBorrowing.getBook() != null) {
-            dto.setBookId(bookBorrowing.getBook().getId());
-        }
-
+        dto.setId(entity.getId());
+        dto.setBorrowerName(entity.getBorrowerName());
+        dto.setBorrowingDate(entity.getBorrowingDate());
+        dto.setReturnDate(entity.getReturnDate());
+        dto.setBookId(entity.getBook() != null ? entity.getBook().getId() : null);
         return dto;
     }
 
     public static BookBorrowing toEntity(BookBorrowingDTO dto, Book book) {
         if (dto == null) return null;
 
-        BookBorrowing bookBorrowing = new BookBorrowing();
-        bookBorrowing.setId(dto.getId());
-        bookBorrowing.setBorrowerName(dto.getBorrowerName());
-        bookBorrowing.setBorrowingDate(dto.getBorrowingDate());
-        bookBorrowing.setReturnDate(dto.getReturnDate());
-
-        // Kitap entity'si servis veya controller katmanında bulunup parametre olarak verilmelidir
-        bookBorrowing.setBook(book);
-
-        return bookBorrowing;
+        BookBorrowing entity = new BookBorrowing();
+        entity.setBorrowerName(dto.getBorrowerName());
+        entity.setBorrowingDate(dto.getBorrowingDate());
+        entity.setReturnDate(dto.getReturnDate());
+        entity.setBook(book);
+        return entity;
     }
 }

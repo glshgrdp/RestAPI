@@ -3,6 +3,7 @@ package com.example.libraryproject.controller;
 import com.example.libraryproject.dto.AuthorDTO;
 import com.example.libraryproject.service.AuthorService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,8 @@ public class AuthorController {
 
     @PostMapping
     public ResponseEntity<AuthorDTO> createAuthor(@Valid @RequestBody AuthorDTO authorDTO) {
-        return ResponseEntity.ok(authorService.createAuthor(authorDTO));
+        AuthorDTO saved = authorService.createAuthor(authorDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping

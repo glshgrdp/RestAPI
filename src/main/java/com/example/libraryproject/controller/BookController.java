@@ -1,9 +1,9 @@
 package com.example.libraryproject.controller;
 
 import com.example.libraryproject.dto.BookDTO;
-import com.example.libraryproject.model.Book;
 import com.example.libraryproject.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,8 +12,11 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
 
-    @Autowired
-    private BookService bookService;
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     @GetMapping
     public List<BookDTO> getAllBooks() {
@@ -21,12 +24,17 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public BookDTO getBookById(@PathVariable Long id) {
-        return bookService.getBookById(id);
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        BookDTO bookDTO = bookService.getBookById(id);
+        if (bookDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(bookDTO);
     }
 
     @PostMapping
-    public Book createBook(@RequestBody BookDTO bookDTO) {
-        return bookService.saveBook(bookDTO);
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+        BookDTO createdBook = bookService.saveBook(bookDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 }

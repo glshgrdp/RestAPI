@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
+    // Belirli bir kategoriye ait kitap var mı diye kontrol eden metot
+    boolean existsByBooks_Categories_Id(Long categoryId);
 }

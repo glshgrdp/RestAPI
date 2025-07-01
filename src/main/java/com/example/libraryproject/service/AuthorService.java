@@ -35,13 +35,13 @@ public class AuthorService {
 
     public AuthorDTO getAuthorById(Long id) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new RuntimeException("Yazar bulunamadı (ID: " + id + ")"));
         return authorMapper.toDTO(author);
     }
 
     public AuthorDTO updateAuthor(Long id, AuthorDTO dto) {
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new RuntimeException("Yazar güncellenemedi, ID bulunamadı: " + id));
 
         author.setName(dto.getName());
         author.setBirthDate(dto.getBirthDate());
@@ -51,7 +51,15 @@ public class AuthorService {
         return authorMapper.toDTO(updated);
     }
 
-    public void deleteAuthor(Long id) {
+    public String deleteAuthor(Long id) {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Yazar silinemedi, ID bulunamadı: " + id));
+
+        if (author.getBooks() != null && !author.getBooks().isEmpty()) {
+            return "Bu yazara ait kitaplar mevcut. Yazar silinemedi.";
+        }
+
         authorRepository.deleteById(id);
+        return "Yazar başarıyla silindi.";
     }
 }

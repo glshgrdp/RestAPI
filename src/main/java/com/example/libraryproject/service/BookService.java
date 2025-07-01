@@ -2,29 +2,36 @@ package com.example.libraryproject.service;
 
 import com.example.libraryproject.dto.BookDTO;
 import com.example.libraryproject.mapper.BookMapper;
-import com.example.libraryproject.model.*;
-import com.example.libraryproject.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.libraryproject.model.Author;
+import com.example.libraryproject.model.Book;
+import com.example.libraryproject.model.Category;
+import com.example.libraryproject.model.Publisher;
+import com.example.libraryproject.repository.AuthorRepository;
+import com.example.libraryproject.repository.BookRepository;
+import com.example.libraryproject.repository.CategoryRepository;
+import com.example.libraryproject.repository.PublisherRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private final PublisherRepository publisherRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
-
-    @Autowired
-    private PublisherRepository publisherRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
+    public BookService(BookRepository bookRepository,
+                       AuthorRepository authorRepository,
+                       PublisherRepository publisherRepository,
+                       CategoryRepository categoryRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+        this.publisherRepository = publisherRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     public List<BookDTO> getAllBooks() {
         return bookRepository.findAll()
@@ -39,27 +46,25 @@ public class BookService {
                 .orElse(null);
     }
 
-    public Book saveBook(BookDTO dto) {
-        Book book = new Book();
-        book.setName(dto.getName());
-        book.setPublicationYear(dto.getPublicationYear());
-        book.setStock(dto.getStock());
-
+    public BookDTO saveBook(BookDTO dto) {
+        Author author = null;
         if (dto.getAuthorId() != null) {
-            Optional<Author> author = authorRepository.findById(dto.getAuthorId());
-            author.ifPresent(book::setAuthor);
+            author = authorRepository.findById(dto.getAuthorId()).orElse(null);
         }
 
+        Publisher publisher = null;
         if (dto.getPublisherId() != null) {
-            Optional<Publisher> publisher = publisherRepository.findById(dto.getPublisherId());
-            publisher.ifPresent(book::setPublisher);
+            publisher = publisherRepository.findById(dto.getPublisherId()).orElse(null);
         }
 
+        List<Category> categories = null;
         if (dto.getCategoryIds() != null) {
-            List<Category> categories = categoryRepository.findAllById(dto.getCategoryIds());
-            book.setCategories(categories);
+            categories = categoryRepository.findAllById(dto.getCategoryIds());
         }
 
-        return bookRepository.save(book);
+        Book book = BookMapper.toEntity(dto, author, publisher, categories);
+
+        Book savedBook = bookRepository.save(book);
+        return BookMapper.toDTO(savedBook);
     }
 }

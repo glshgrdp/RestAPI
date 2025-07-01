@@ -4,33 +4,31 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id") // Opsiyonel ama açıkça yazmak iyi olur
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "publication_year", nullable = false)
     private int publicationYear;
 
-    @Column(nullable = false)
+    @Column(name = "stock", nullable = false)
     private int stock;
 
-    // Bir kitabın bir yazarı olabilir (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 
-    // Bir kitabın bir yayınevi olabilir (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
-    // Bir kitabın birden fazla kategorisi olabilir (ManyToMany)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_categories",
@@ -39,15 +37,22 @@ public class Book {
     )
     private List<Category> categories;
 
-    // Bir kitabın birden fazla ödünç alma kaydı olabilir (OneToMany)
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookBorrowing> borrowings;
 
     // Boş constructor
     public Book() {}
 
-    // Getter ve Setter metodları
+    // Parametreli constructor
+    public Book(String name, int publicationYear, int stock, Author author, Publisher publisher) {
+        this.name = name;
+        this.publicationYear = publicationYear;
+        this.stock = stock;
+        this.author = author;
+        this.publisher = publisher;
+    }
 
+    // Getter ve Setter metodları
     public Long getId() {
         return id;
     }

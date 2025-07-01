@@ -32,6 +32,7 @@ public class BookBorrowingController {
 
     @PostMapping
     public ResponseEntity<BookBorrowingDTO> createBorrowing(@RequestBody BookBorrowingDTO dto) {
+        dto.setId(null); // kesin POST için id null
         return bookBorrowingService.saveBorrowing(dto)
                 .map(saved -> ResponseEntity.status(HttpStatus.CREATED).body(saved))
                 .orElse(ResponseEntity.badRequest().build());

@@ -35,11 +35,21 @@ public class BookBorrowingService {
     }
 
     public Optional<BookBorrowingDTO> saveBorrowing(BookBorrowingDTO dto) {
-        Optional<Book> bookOpt = bookRepository.findById(dto.getBookId());
+        if (dto.getId() != null) {
+            // POST için id null olmalı
+            return Optional.empty();
+        }
 
+        Optional<Book> bookOpt = bookRepository.findById(dto.getBookId());
         if (bookOpt.isEmpty()) return Optional.empty();
 
-        BookBorrowing borrowing = BookBorrowingMapper.toEntity(dto, bookOpt.get());
+        Book book = bookOpt.get();
+        if (book.getStock() <= 0) return Optional.empty();
+
+        book.setStock(book.getStock() - 1);
+        bookRepository.save(book);
+
+        BookBorrowing borrowing = BookBorrowingMapper.toEntity(dto, book);
         borrowing = bookBorrowingRepository.save(borrowing);
 
         return Optional.of(BookBorrowingMapper.toDTO(borrowing));
